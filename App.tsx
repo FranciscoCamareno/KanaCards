@@ -244,13 +244,16 @@ const App: React.FC = () => {
                   
                   <div>
                     <h3 className="text-xs font-black text-slate-400 uppercase mb-4 tracking-widest">Groups</h3>
-                    <div className="max-h-60 overflow-y-auto pr-2 custom-scrollbar space-y-2">
+                    <div className="max-h-60 overflow-y-auto pr-2 custom-scrollbar grid grid-cols-1 sm:grid-cols-2 gap-2">
+
+                    {/*
                       <button
                         onClick={toggleDiacritics}
                         className={`w-full text-left px-4 py-2.5 rounded-xl text-sm font-bold border-2 transition-all ${hasDiacriticsEnabled ? 'bg-indigo-50 border-indigo-200 text-indigo-700' : 'bg-slate-50 border-slate-100 text-slate-500'}`}
                       >
-                        Include Diacritics (G, Z, D, B, P)
+                        Include All Diacritics
                       </button>
+                      */}
                       {KANA_GROUPS.filter(g => !DIACRITIC_GROUPS.includes(g)).map(group => (
                         <button
                           key={group}
