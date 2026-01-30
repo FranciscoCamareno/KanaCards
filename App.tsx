@@ -192,7 +192,7 @@ const App: React.FC = () => {
         )}
 
         {view === 'study' && (
-          <div className="max-w-2xl mx-auto py-8 px-4 flex flex-col items-center min-h-screen">
+          <div className="max-w-2xl mx-auto py-8 px-4 flex flex-col items-center">
             <div className="w-full flex justify-between items-center mb-8">
               <button onClick={() => setView('welcome')} className="text-slate-400 hover:text-slate-600 font-bold">Exit</button>
               <div className="bg-indigo-100 text-indigo-700 px-4 py-1.5 rounded-full text-sm font-black">
@@ -291,7 +291,7 @@ const App: React.FC = () => {
         )}
       </main>
 
-      <footer className="w-full max-w-4xl mx-auto px-6 py-12 flex flex-col md:flex-row items-center justify-between gap-8 border-t border-slate-200/60 mt-20">
+      <footer className="w-full max-w-4xl mx-auto px-6 py-12 flex flex-col md:flex-row items-center justify-between gap-8 border-t border-slate-200/60 mt-12">
         <div className="text-center md:text-left space-y-1">
           <p className="font-black text-slate-700 text-lg tracking-tight">Kana<span className="text-indigo-600">Cards</span></p>
           <p className="text-slate-400 text-sm">by FCamareno</p>
