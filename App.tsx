@@ -1,10 +1,11 @@
+
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { ALL_KANA, KANA_GROUPS } from './constants';
 import { KanaItem, AIHelp, KanaType, StudyMode } from './types';
 import { getKanaMnemonics } from './services/geminiService';
 import Flashcard from './components/Flashcard';
 
-// Algoritmo Fisher-Yates para barajar el mazo
+// Fisher-Yates shuffle algorithm
 const shuffleArray = <T,>(array: T[]): T[] => {
   const shuffled = [...array];
   for (let i = shuffled.length - 1; i > 0; i--) {
@@ -39,7 +40,7 @@ const App: React.FC = () => {
   const [studyQueue, setStudyQueue] = useState<KanaItem[]>([]);
   const [seenCount, setSeenCount] = useState(0);
 
-  // Pool de caracteres filtrados según la selección del usuario
+  // Pool of filtered characters based on user selection
   const pool = useMemo(() => {
     return ALL_KANA.filter(item => 
       selectedGroups.has(item.group) && selectedTypes.has(item.type)
@@ -69,7 +70,7 @@ const App: React.FC = () => {
     if (view === 'study' && pool.length > 0) {
       startNewRound(pool);
     }
-  }, [view, pool.length]); // Solo reacciona al entrar a estudio o si el pool cambia drásticamente
+  }, [view, pool.length]);
 
   const handleRandomize = useCallback(() => {
     if (pool.length === 0) return;
@@ -83,7 +84,7 @@ const App: React.FC = () => {
       setStudyQueue(prev => prev.slice(1));
       setSeenCount(prev => prev + 1);
     } else {
-      // Reiniciar mazo barajado si se terminaron las cartas
+      // Restart shuffled deck if cards ran out
       startNewRound(pool);
     }
   }, [pool, studyQueue, startNewRound]);
@@ -152,13 +153,13 @@ const App: React.FC = () => {
                 onClick={() => setView('charts')}
                 className="flex-1 py-4 bg-white border-2 border-slate-200 text-slate-700 rounded-2xl shadow-sm hover:border-indigo-200 transition-all font-semibold"
               >
-                Ver Tablas
+                View Charts
               </button>
               <button 
                 onClick={() => setView('study')}
                 className="flex-1 py-4 bg-indigo-600 text-white rounded-2xl shadow-lg shadow-indigo-100 hover:bg-indigo-700 hover:-translate-y-1 transition-all font-bold"
               >
-                Empezar a Estudiar
+                Start Studying
               </button>
             </div>
           </div>
@@ -170,7 +171,7 @@ const App: React.FC = () => {
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
               </svg>
-              Volver al inicio
+              Back to home
             </button>
             <div className="space-y-12">
               {(['hiragana', 'katakana'] as const).map(type => (
@@ -193,7 +194,7 @@ const App: React.FC = () => {
         {view === 'study' && (
           <div className="max-w-2xl mx-auto py-8 px-4 flex flex-col items-center min-h-screen">
             <div className="w-full flex justify-between items-center mb-8">
-              <button onClick={() => setView('welcome')} className="text-slate-400 hover:text-slate-600 font-bold">Salir</button>
+              <button onClick={() => setView('welcome')} className="text-slate-400 hover:text-slate-600 font-bold">Exit</button>
               <div className="bg-indigo-100 text-indigo-700 px-4 py-1.5 rounded-full text-sm font-black">
                 {seenCount} / {pool.length}
               </div>
@@ -211,7 +212,7 @@ const App: React.FC = () => {
               <div className="w-full bg-white p-8 rounded-3xl shadow-2xl border border-slate-100 mb-8 animate-in zoom-in duration-300">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div>
-                    <h3 className="text-xs font-black text-slate-400 uppercase mb-4 tracking-widest">Sistemas</h3>
+                    <h3 className="text-xs font-black text-slate-400 uppercase mb-4 tracking-widest">Systems</h3>
                     <div className="flex gap-3">
                       {(['hiragana', 'katakana'] as KanaType[]).map(type => (
                         <button
@@ -224,31 +225,31 @@ const App: React.FC = () => {
                       ))}
                     </div>
 
-                    <h3 className="text-xs font-black text-slate-400 uppercase mt-8 mb-4 tracking-widest">Modo</h3>
+                    <h3 className="text-xs font-black text-slate-400 uppercase mt-8 mb-4 tracking-widest">Mode</h3>
                     <div className="flex flex-col gap-2">
                       <button
                         onClick={() => setStudyMode('char-first')}
                         className={`text-left px-4 py-3 rounded-xl font-bold border-2 transition-all ${studyMode === 'char-first' ? 'bg-white border-indigo-600 text-indigo-600' : 'bg-slate-50 border-slate-100 text-slate-400'}`}
                       >
-                        Carácter → Romaji
+                        Character → Romaji
                       </button>
                       <button
                         onClick={() => setStudyMode('romaji-first')}
                         className={`text-left px-4 py-3 rounded-xl font-bold border-2 transition-all ${studyMode === 'romaji-first' ? 'bg-white border-indigo-600 text-indigo-600' : 'bg-slate-50 border-slate-100 text-slate-400'}`}
                       >
-                        Romaji → Carácter
+                        Romaji → Character
                       </button>
                     </div>
                   </div>
                   
                   <div>
-                    <h3 className="text-xs font-black text-slate-400 uppercase mb-4 tracking-widest">Grupos</h3>
+                    <h3 className="text-xs font-black text-slate-400 uppercase mb-4 tracking-widest">Groups</h3>
                     <div className="max-h-60 overflow-y-auto pr-2 custom-scrollbar space-y-2">
                       <button
                         onClick={toggleDiacritics}
                         className={`w-full text-left px-4 py-2.5 rounded-xl text-sm font-bold border-2 transition-all ${hasDiacriticsEnabled ? 'bg-indigo-50 border-indigo-200 text-indigo-700' : 'bg-slate-50 border-slate-100 text-slate-500'}`}
                       >
-                        ✨ Incluir Diacríticos (G, Z, D, B, P)
+                        Include Diacritics (G, Z, D, B, P)
                       </button>
                       {KANA_GROUPS.filter(g => !DIACRITIC_GROUPS.includes(g)).map(group => (
                         <button
@@ -283,7 +284,7 @@ const App: React.FC = () => {
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                 </svg>
-                Siguiente Símbolo
+                Next Character
               </button>
             </div>
           </div>
@@ -307,8 +308,6 @@ const App: React.FC = () => {
           style={{ height: 36, border: 0 }}
         />
       </a>
-
-       
       </footer>
     </div>
   );
