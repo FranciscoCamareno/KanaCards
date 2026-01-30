@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { ALL_KANA, KANA_GROUPS } from './constants';
 import { KanaItem, AIHelp, KanaType, StudyMode } from './types';
-import { getKanaMnemonics } from './services/geminiService';
+
 import Flashcard from './components/Flashcard';
 
 // Fisher-Yates shuffle algorithm

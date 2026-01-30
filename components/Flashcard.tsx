@@ -72,7 +72,7 @@ const Flashcard: React.FC<FlashcardProps> = ({ item, isFlipped, onFlip, aiHelp, 
                 )}
               </>
             ) : (
-               <div className="text-center py-4 text-slate-400 text-xs">AI insights only available on flip</div>
+               <div className="text-center py-4 text-slate-400 text-xs">Answer</div>
             )}
           </div>
 

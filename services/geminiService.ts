@@ -4,7 +4,7 @@ import { AIHelp } from "../types";
 
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
-export async function getKanaMnemonics(char: string, romaji: string): Promise<AIHelp> {
+async function getKanaMnemonics(char: string, romaji: string): Promise<AIHelp> {
   try {
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
