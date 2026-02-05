@@ -1,0 +1,7 @@
+This project uses animCJK
+https://github.com/parsimonhi/animCJK
+
+animCJK is licensed under the GNU General Public License v3.0.
+Copyright (C) the animCJK contributors.
+
+Full license text to be added here by project owner.

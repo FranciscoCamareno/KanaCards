@@ -1,9 +1,9 @@
-
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { ALL_KANA, KANA_GROUPS } from './constants';
 import { KanaItem, AIHelp, KanaType, StudyMode } from './types';
 
 import Flashcard from './components/Flashcard';
+import StrokeOrderViewer from './components/StrokeOrderViewer';
 
 // Fisher-Yates shuffle algorithm
 const shuffleArray = <T,>(array: T[]): T[] => {
@@ -30,11 +30,13 @@ const App: React.FC = () => {
   const [selectedGroups, setSelectedGroups] = useState<Set<string>>(new Set([KANA_GROUPS[0]]));
   const [selectedTypes, setSelectedTypes] = useState<Set<KanaType>>(new Set(['hiragana']));
   const [studyMode, setStudyMode] = useState<StudyMode>('char-first');
+  const [strokePreviewChar, setStrokePreviewChar] = useState<string | null>(null);
   
   const [currentItem, setCurrentItem] = useState<KanaItem | null>(null);
   const [isFlipped, setIsFlipped] = useState(false);
   const [aiHelp, setAiHelp] = useState<AIHelp | null>(null);
   const [isLoadingAi, setIsLoadingAi] = useState(false);
+  
   const [showSettings, setShowSettings] = useState(false);
   
   const [studyQueue, setStudyQueue] = useState<KanaItem[]>([]);
@@ -179,7 +181,11 @@ const App: React.FC = () => {
                   <h2 className="text-2xl font-bold mb-8 text-indigo-600 capitalize">{type}</h2>
                   <div className="grid grid-cols-5 sm:grid-cols-10 gap-4">
                     {ALL_KANA.filter(k => k.type === type && !DIACRITIC_GROUPS.includes(k.group)).map((item, idx) => (
-                      <div key={idx} className="flex flex-col items-center p-3 rounded-xl hover:bg-indigo-50 transition-colors group">
+                      <div
+                        key={idx}
+                        onClick={() => setStrokePreviewChar(item.char)}
+                        className="flex flex-col items-center p-3 rounded-xl hover:bg-indigo-50 transition-colors group cursor-pointer"
+                      >
                         <span className="text-3xl font-bold text-slate-800 group-hover:scale-110 transition-transform">{item.char}</span>
                         <span className="text-xs text-slate-400 font-bold uppercase">{item.romaji}</span>
                       </div>
@@ -188,6 +194,34 @@ const App: React.FC = () => {
                 </section>
               ))}
             </div>
+
+            {strokePreviewChar && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center px-4" role="dialog" aria-modal="true">
+                <div
+                  className="absolute inset-0 bg-slate-900/50"
+                  onClick={() => setStrokePreviewChar(null)}
+                />
+                <div className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-slate-100 p-6">
+                  <div className="flex items-start justify-between gap-4 mb-4">
+                    <div>
+                      <div className="text-slate-400 text-xs font-black uppercase tracking-widest">Stroke Order</div>
+                      <div className="text-4xl font-extrabold text-slate-800">{strokePreviewChar}</div>
+                    </div>
+                    <button
+                      onClick={() => setStrokePreviewChar(null)}
+                      className="px-3 py-2 rounded-xl bg-slate-100 text-slate-600 font-bold hover:bg-slate-200 transition-colors"
+                      aria-label="Close"
+                    >
+                      Close
+                    </button>
+                  </div>
+
+                  <div className="bg-slate-50 rounded-2xl border border-slate-100 p-4">
+                    <StrokeOrderViewer character={strokePreviewChar} />
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
