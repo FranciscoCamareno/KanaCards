@@ -1,3 +1,11 @@
+/*
+ * This file is part of KanaCards
+ * Copyright (C) 2026 FCamareno
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 3.
+ */
+
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { ALL_KANA, KANA_GROUPS } from './constants';
 import { KanaItem, AIHelp, KanaType, StudyMode } from './types';
@@ -178,7 +186,12 @@ const App: React.FC = () => {
             <div className="space-y-12">
               {(['hiragana', 'katakana'] as const).map(type => (
                 <section key={type} className="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
-                  <h2 className="text-2xl font-bold mb-8 text-indigo-600 capitalize">{type}</h2>
+                  <div className="flex items-end justify-between gap-6 mb-8">
+                    <h2 className="text-2xl font-bold text-indigo-600 capitalize">{type}</h2>
+                    <div className="text-xs text-slate-400 font-bold uppercase tracking-widest">
+                      Click a character to preview stroke order
+                    </div>
+                  </div>
                   <div className="grid grid-cols-5 sm:grid-cols-10 gap-4">
                     {ALL_KANA.filter(k => k.type === type && !DIACRITIC_GROUPS.includes(k.group)).map((item, idx) => (
                       <div
@@ -212,7 +225,7 @@ const App: React.FC = () => {
                       className="px-3 py-2 rounded-xl bg-slate-100 text-slate-600 font-bold hover:bg-slate-200 transition-colors"
                       aria-label="Close"
                     >
-                      Close
+                      X
                     </button>
                   </div>
 
