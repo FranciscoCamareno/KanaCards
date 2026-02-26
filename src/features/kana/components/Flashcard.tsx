@@ -1,5 +1,11 @@
-
-import React from 'react';
+/*
+ * This file is part of KanaCards
+ * Copyright (C) 2026 FCamareno
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 3.
+ */
+import React, { useEffect, useRef, useState } from 'react';
 import { KanaItem, AIHelp, StudyMode } from '../types';
 
 interface FlashcardProps {
@@ -12,7 +18,58 @@ interface FlashcardProps {
 }
 
 const Flashcard: React.FC<FlashcardProps> = ({ item, isFlipped, onFlip, aiHelp, isLoadingAi, studyMode }) => {
-  if (!item) {
+  const [displayItem, setDisplayItem] = useState<KanaItem | null>(item);
+  const pendingItemRef = useRef<KanaItem | null>(null);
+  const swapTimeoutRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (swapTimeoutRef.current !== null) {
+      window.clearTimeout(swapTimeoutRef.current);
+      swapTimeoutRef.current = null;
+    }
+
+    if (!item) {
+      pendingItemRef.current = null;
+      setDisplayItem(null);
+      return;
+    }
+
+    const isSame =
+      displayItem &&
+      item.char === displayItem.char &&
+      item.romaji === displayItem.romaji &&
+      item.type === displayItem.type &&
+      item.group === displayItem.group;
+
+    if (isSame) return;
+
+    if (isFlipped) {
+      pendingItemRef.current = item;
+      swapTimeoutRef.current = window.setTimeout(() => {
+        setDisplayItem(item);
+        pendingItemRef.current = null;
+        swapTimeoutRef.current = null;
+      }, 700);
+      return;
+    }
+
+    setDisplayItem(item);
+  }, [item, isFlipped, displayItem]);
+
+  useEffect(() => {
+    if (isFlipped) return;
+    if (!pendingItemRef.current) return;
+
+    if (swapTimeoutRef.current !== null) {
+      window.clearTimeout(swapTimeoutRef.current);
+      swapTimeoutRef.current = null;
+    }
+
+    setDisplayItem(pendingItemRef.current);
+    pendingItemRef.current = null;
+  }, [isFlipped]);
+
+  if (!displayItem) {
     return (
       <div className="w-full max-w-sm h-80 flex items-center justify-center bg-white rounded-3xl border-2 border-dashed border-slate-300">
         <p className="text-slate-400 italic">Select characters and press Randomize</p>
@@ -29,10 +86,10 @@ const Flashcard: React.FC<FlashcardProps> = ({ item, isFlipped, onFlip, aiHelp, 
         {/* Front Side */}
         <div className="absolute inset-0 backface-hidden flex flex-col items-center justify-center bg-white rounded-3xl shadow-xl border border-slate-100">
           <span className={`${isCharFirst ? 'text-9xl' : 'text-7xl'} font-bold text-slate-800 mb-4`}>
-            {isCharFirst ? item.char : item.romaji}
+            {isCharFirst ? displayItem.char : displayItem.romaji}
           </span>
           <span className="text-sm uppercase tracking-widest text-indigo-500 font-semibold">
-            {isCharFirst ? item.type : 'Romaji'}
+            {isCharFirst ? displayItem.type : 'Romaji'}
           </span>
           <div className="absolute bottom-6 text-slate-300 text-xs animate-pulse">Click to Reveal</div>
         </div>
@@ -41,10 +98,10 @@ const Flashcard: React.FC<FlashcardProps> = ({ item, isFlipped, onFlip, aiHelp, 
         <div className="absolute inset-0 backface-hidden rotate-y-180 flex flex-col items-center justify-between p-8 bg-indigo-50 rounded-3xl shadow-xl border border-indigo-100">
           <div className="flex flex-col items-center mt-4">
             <span className={`${isCharFirst ? 'text-6xl' : 'text-8xl'} font-bold text-indigo-600`}>
-              {isCharFirst ? item.romaji : item.char}
+              {isCharFirst ? displayItem.romaji : displayItem.char}
             </span>
             <span className="text-xl text-slate-500 mt-2">
-              {isCharFirst ? item.char : item.romaji}
+              {isCharFirst ? displayItem.char : displayItem.romaji}
             </span>
           </div>
 

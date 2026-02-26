@@ -10,8 +10,8 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { ALL_KANA, KANA_GROUPS } from './constants';
 import { KanaItem, AIHelp, KanaType, StudyMode } from './types';
 
-import Flashcard from './components/Flashcard';
-import StrokeOrderViewer from './components/StrokeOrderViewer';
+import Flashcard from './src/features/kana/components/Flashcard';
+import StrokeOrderViewer from './src/features/kana/components/StrokeOrderViewer';
 
 // Fisher-Yates shuffle algorithm
 const shuffleArray = <T,>(array: T[]): T[] => {
@@ -22,6 +22,8 @@ const shuffleArray = <T,>(array: T[]): T[] => {
   }
   return shuffled;
 };
+
+const FLIP_ANIMATION_MS = 700;
 
 const DIACRITIC_GROUPS = [
   "G-series (ga, gi, gu, ge, go)",
@@ -44,6 +46,7 @@ const App: React.FC = () => {
   const [isFlipped, setIsFlipped] = useState(false);
   const [aiHelp, setAiHelp] = useState<AIHelp | null>(null);
   const [isLoadingAi, setIsLoadingAi] = useState(false);
+  const [isAdvancing, setIsAdvancing] = useState(false);
   
   const [showSettings, setShowSettings] = useState(false);
   
@@ -74,6 +77,7 @@ const App: React.FC = () => {
     setSeenCount(1);
     setIsFlipped(false);
     setAiHelp(null);
+    setIsAdvancing(false);
   }, []);
 
   useEffect(() => {
@@ -84,20 +88,30 @@ const App: React.FC = () => {
 
   const handleRandomize = useCallback(() => {
     if (pool.length === 0) return;
-    
-    setIsFlipped(false);
+    if (isAdvancing) return;
+
+    setIsAdvancing(true);
     setAiHelp(null);
 
-    if (studyQueue.length > 0) {
-      const nextItem = studyQueue[0];
-      setCurrentItem(nextItem);
-      setStudyQueue(prev => prev.slice(1));
-      setSeenCount(prev => prev + 1);
+    const advance = () => {
+      if (studyQueue.length > 0) {
+        const nextItem = studyQueue[0];
+        setCurrentItem(nextItem);
+        setStudyQueue(prev => prev.slice(1));
+        setSeenCount(prev => prev + 1);
+        setIsAdvancing(false);
+      } else {
+        startNewRound(pool);
+      }
+    };
+
+    if (isFlipped) {
+      setIsFlipped(false);
+      window.setTimeout(advance, FLIP_ANIMATION_MS);
     } else {
-      // Restart shuffled deck if cards ran out
-      startNewRound(pool);
+      advance();
     }
-  }, [pool, studyQueue, startNewRound]);
+  }, [pool, studyQueue, startNewRound, isFlipped, isAdvancing]);
 
   const handleFlip = async () => {
     const newFlipState = !isFlipped;
@@ -328,7 +342,7 @@ const App: React.FC = () => {
 
               <button 
                 onClick={handleRandomize}
-                disabled={pool.length === 0}
+                disabled={pool.length === 0 || isAdvancing}
                 className="w-full py-5 bg-indigo-600 text-white rounded-3xl shadow-xl shadow-indigo-200 hover:bg-indigo-700 hover:scale-[1.02] active:scale-[0.98] transition-all font-black text-xl flex items-center justify-center gap-3 disabled:opacity-50"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
